@@ -3,7 +3,7 @@ fn main() {
 
     let (mut col1, mut col2): (Vec<_>, Vec<_>) = data
         .lines()
-        .map(|line| line.trim().split_whitespace().collect::<Vec<_>>())
+        .map(|line| line.split_whitespace().collect::<Vec<_>>())
         .map(|pair| {
             (
                 pair[0].parse::<u64>().unwrap(),
