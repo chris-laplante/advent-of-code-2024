@@ -36,24 +36,27 @@ fn calculate(input: &str) -> u64 {
                 state = ParserState::EatOperand1;
             }
             ParserState::EatOperand1 => {
-                let d = m.eat_range_of(",");
-                let maybe_operand1 = &m.text()[d.0..d.1];
+                let maybe_operand1 = m.peek_until_count(|ch| ch == &',');
+                let maybe_operand1 = &m.text()[maybe_operand1.0..maybe_operand1.1];
+
                 if let Ok(operand1) = maybe_operand1.parse::<u64>() {
-                    if m.eat_comma() {
+                    if m.peek() == Some(&',') {
+                        m.advance(maybe_operand1.len() + 1);
                         state = ParserState::EatOperand2 { operand1 };
                         continue;
                     }
                 }
 
-                m.advance(d.1 - d.0);
+                dbg!(maybe_operand1);
                 state = ParserState::ExpectMul;
             }
             ParserState::EatOperand2 { operand1 } => {
-                let d = m.eat_range_of(")");
-                let maybe_operand2 = &m.text()[d.0..d.1];
+                let maybe_operand2 = m.peek_until_count(|ch| ch == &')');
+                let maybe_operand2 = &m.text()[maybe_operand2.0..maybe_operand2.1];
+
                 if let Ok(operand2) = maybe_operand2.parse::<u64>() {
                     operations.push((operand1, operand2));
-                    assert!(m.eat_close_paren());
+                    m.advance(maybe_operand2.len() + 1);
                 }
 
                 state = ParserState::ExpectMul;
@@ -79,8 +82,30 @@ mod test {
     use crate::calculate;
 
     #[test]
+    fn zero() {
+        assert_eq!(calculate(""), 0);
+    }
+
+    #[test]
+    fn simple0() {
+        assert_eq!(calculate("mul(1,2)"), 2);
+    }
+
+    #[test]
     fn simple1() {
         let input = "mul(11,8)mul(8,5)";
-        assert_eq!(calculate(input), 10);
+        assert_eq!(calculate(input), 128);
+    }
+
+    #[test]
+    fn longer0() {
+        let input = "' mul(382,128)select(){*who(710,947)mul(117,325)?$#from()/select()mul(829,251)}@mul(17,183)(:*when()}?+,what()mul(911,142)";
+        assert_eq!(calculate(input), (382*128)+(117*325)+(829*251)+(17*183)+(911*142));
+    }
+
+    #[test]
+    fn longer1() {
+        let input = "' mul(382,128)select(){*who(710,947)mul(117325)?$#from()/select()mul(829,251)}@mul(17,183)(:*when()}?+,what()mul(911,142)";
+        assert_eq!(calculate(input), (382*128)+(829*251)+(17*183)+(911*142));
     }
 }
