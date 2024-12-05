@@ -7,7 +7,7 @@ enum Sign {
 }
 
 fn main() {
-    let data = include_str!("../resources/day_2/puzzle_2.txt");
+    let data = include_str!("../../resources/day_2/puzzle_2.txt");
 
     // Parse reports
     let reports = data

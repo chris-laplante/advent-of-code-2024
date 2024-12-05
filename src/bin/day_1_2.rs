@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 fn main() {
-    let data = include_str!("../resources/day_1/puzzle_1.txt");
+    let data = include_str!("../../resources/day_1/puzzle_1.txt");
 
     let (col1, mut col2): (Vec<_>, Vec<_>) = data
         .lines()
